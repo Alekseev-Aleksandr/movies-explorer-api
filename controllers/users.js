@@ -2,6 +2,7 @@ const jwt = require('jsonwebtoken');
 const Conflict = require('../errors/Conflict');
 const NotFound = require('../errors/NotFound');
 const User = require('../models/user');
+require('dotenv').config();
 
 const {
   NODE_ENV = 'noProd',
