@@ -19,7 +19,7 @@
     "nodemon": "^3.0.1"
   },
   "dependencies": {
-    "@joi/date": "^2.1.0",
+
     "bcrypt": "^5.1.0",
     "celebrate": "^15.0.1",
     "cookie-parser": "^1.4.6",
