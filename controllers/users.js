@@ -16,11 +16,9 @@ const createNewUser = ((req, res, next) => {
       User.create(req.body)
         .then((user) => {
           res
-            .status(200)
             .send({
               email: user.email,
               name: user.name,
-              password: user.password,
             });
         }).catch((err) => {
           if (err.code === 11000) {
@@ -29,14 +27,25 @@ const createNewUser = ((req, res, next) => {
           return next(err);
         });
     })
-    .catch(next);
+    .catch((err) => {
+      if (err.code === 11000) {
+        return next(new Conflict('a user with email this already exists'));
+      }
+      return next(err);
+    });
 });
 
 const getMyInfo = ((req, res, next) => {
   User.findById(req.body._id)
     .then((myInfo) => {
-      if (myInfo) res.status(200).send({ myInfo });
-      else throw next(new NotFound('User with id not found'));
+      if (myInfo) {
+        res.send(
+          {
+            name: myInfo.name,
+            email: myInfo.email,
+          },
+        );
+      } else throw next(new NotFound('User with id not found'));
     }).catch(next);
 });
 
@@ -45,14 +54,20 @@ const updateMyInfo = ((req, res, next) => {
     req.user._id,
     {
       name: req.body.name,
+      email: req.body.email,
     },
-    { new: true },
+    { new: true, runValidators: true },
   )
     .orFail(() => {
       next(new NotFound('User with id not found'));
     })
-    .then((user) => res.status(200).send({ newUserInfo: user }))
-    .catch(next);
+    .then((user) => res.send({ newUserInfo: user }))
+    .catch((err) => {
+      if (err.code === 11000) {
+        return next(new Conflict('a user with email this already exists'));
+      }
+      return next(err);
+    });
 });
 
 const login = (req, res, next) => {
@@ -70,7 +85,7 @@ const login = (req, res, next) => {
         httpOnly: true,
         sameSite: true,
       });
-      res.status(200).send(({ message: 'All right', token: newToken }));
+      res.send(({ message: 'All right', token: newToken }));
     })
     .catch(next);
 };

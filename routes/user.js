@@ -6,26 +6,19 @@ const {
   logOut,
 } = require('../controllers/users');
 
-router.get(
-  '/users/me',
-  celebrate({
-    body: Joi.object().keys({
-      name: Joi.string().min(2).max(30).required(),
-    }),
-  }),
-  getMyInfo,
-);
+router.get('/users/me', getMyInfo);
 
 router.patch(
   '/users/me',
   celebrate({
     body: Joi.object().keys({
       name: Joi.string().min(2).max(30).required(),
+      email: Joi.string().email({ minDomainSegments: 2 }).required(),
     }),
   }),
   updateMyInfo,
 );
 
-router.get('/logout', logOut);
+router.get('/signout', logOut);
 
 module.exports = router;

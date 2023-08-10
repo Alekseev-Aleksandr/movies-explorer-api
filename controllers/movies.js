@@ -5,7 +5,7 @@ const NotFound = require('../errors/NotFound');
 
 const getMyFilms = ((req, res, next) => {
   Movie.find({ owner: req.user._id })
-    .then((movies) => res.status(200).send(movies))
+    .then((movies) => res.send(movies))
     .catch(next);
 });
 
@@ -24,7 +24,6 @@ const createFilm = ((req, res, next) => {
 });
 
 const deleteFilm = ((req, res, next) => {
-  console.log('olaaaaaaaaaaaaaa');
   Movie.findById(req.params.id)
     .orFail(() => {
       throw new NotFound('Not found movie by id');
@@ -32,7 +31,7 @@ const deleteFilm = ((req, res, next) => {
     .then((movie) => {
       if (movie.owner.toString() === req.user._id) {
         return Movie.deleteOne(movie)
-          .then((res).status(200).send({ message: 'movie was deleted' }));
+          .then((res).send({ message: 'movie was deleted' }));
       }
       throw new Forbidden('No rights to delete');
     })

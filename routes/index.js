@@ -8,6 +8,7 @@ const {
   createNewUser,
   login,
 } = require('../controllers/users');
+const NotFound = require('../errors/NotFound');
 
 router.post(
   '/signup',
@@ -36,5 +37,13 @@ router.use(auth);
 
 router.use(userRouters);
 router.use(movieRouters);
+
+router.use('*', (req, res, next) => {
+  try {
+    throw new NotFound('404 page not found');
+  } catch (err) {
+    next(err);
+  }
+});
 
 module.exports = router;

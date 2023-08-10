@@ -4,9 +4,7 @@ const BadRequest = require('../errors/BadRequest');
 require('dotenv').config();
 
 module.exports = (req, res, next) => {
-  console.log(req.cookies);
   const token = req.cookies.jwt;
-  console.log('token = ', token);
   if (!token) {
     return next(new Unauthorized('Please log in'));
   }
@@ -22,7 +20,6 @@ module.exports = (req, res, next) => {
       token,
       NODE_ENV === 'production' ? JWT_SECRET : 'unique-secret-key',
     );
-    console.log('payload = ', payload);
   } catch (err) {
     if (err.name === 'JsonWebTokenError') next(new BadRequest('Invalid token'));
     throw new Unauthorized('Please log in');
