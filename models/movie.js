@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const validator = require('validator');
+const { MESSAGE_400 } = require('../utils/errMessages');
 
 const movieSchema = mongoose.Schema({
   country: {
@@ -27,7 +28,7 @@ const movieSchema = mongoose.Schema({
     required: true,
     validate: {
       validator: (v) => validator.isURL(v),
-      message: 'Invalid link image',
+      message: MESSAGE_400,
     },
   },
   trailerLink: {
@@ -35,7 +36,7 @@ const movieSchema = mongoose.Schema({
     required: true,
     validate: {
       validator: (v) => validator.isURL(v),
-      message: 'Invalid trailer link ',
+      message: MESSAGE_400,
     },
   },
   thumbnail: {
@@ -43,7 +44,7 @@ const movieSchema = mongoose.Schema({
     required: true,
     validate: {
       validator: (v) => validator.isURL(v),
-      message: 'Invalid link image thumbnail',
+      message: MESSAGE_400,
     },
   },
   owner: {

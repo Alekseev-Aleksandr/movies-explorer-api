@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 const validator = require('validator');
 const bcrypt = require('bcrypt');
 const Unauthorized = require('../errors/Unauthorized');
+const { MESSAGE_400, MESSAGE_409_INVALID } = require('../utils/errMessages');
 
 const userSchema = new mongoose.Schema({
   email: {
@@ -9,7 +10,7 @@ const userSchema = new mongoose.Schema({
     required: true,
     unique: true,
     validator: (v) => validator.isEmail(v),
-    message: 'Invalid email',
+    message: MESSAGE_400,
   },
   password: {
     type: String,
@@ -29,12 +30,12 @@ userSchema.statics.findUserByCredentials = function (email, password, next) {
     .select('+password')
     .then((user) => {
       if (!user) {
-        throw new Unauthorized('Invalid password or login111');
+        throw new Unauthorized(MESSAGE_409_INVALID);
       }
       return bcrypt.compare(password, user.password)
         .then((matched) => {
           if (!matched) {
-            throw new Unauthorized('Invalid password or login');
+            throw new Unauthorized(MESSAGE_409_INVALID);
           }
           return (user);
         })

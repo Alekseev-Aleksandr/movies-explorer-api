@@ -13,4 +13,8 @@ const {
   MONGO_URL = 'mongodb://localhost:27017',
 } = process.env;
 
-module.exports = { PORT, limiter, MONGO_URL };
+module.exports = {
+  PORT,
+  limiter,
+  MONGO_URL,
+};

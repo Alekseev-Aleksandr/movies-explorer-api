@@ -6,22 +6,22 @@ const {
   deleteFilm,
 } = require('../controllers/movies');
 
-const regExp = /^(https?):\/\/[^ "]+$/;
+const regExp = /(ftp|http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-/]))?/;
 
 router.get('/movies', getMyFilms);
 
 router.post('/movies', celebrate({
   body: Joi.object().keys({
-    country: Joi.string().min(2).max(30).required(),
-    director: Joi.string().min(2).max(30).required(),
+    country: Joi.string().required(),
+    director: Joi.string().required(),
     duration: Joi.number().required(),
     year: Joi.number().required(),
-    description: Joi.string().min(2).max(30).required(),
+    description: Joi.string().required(),
     image: Joi.string().pattern(regExp).required(),
     trailerLink: Joi.string().pattern(regExp).required(),
     thumbnail: Joi.string().pattern(regExp).required(),
-    nameRU: Joi.string().min(2).max(30).required(),
-    nameEN: Joi.string().min(2).max(30).required(),
+    nameRU: Joi.string().required(),
+    nameEN: Joi.string().required(),
     movieId: Joi.number().required(),
   }),
 }), createFilm);

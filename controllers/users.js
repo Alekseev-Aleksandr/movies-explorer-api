@@ -2,6 +2,14 @@ const jwt = require('jsonwebtoken');
 const Conflict = require('../errors/Conflict');
 const NotFound = require('../errors/NotFound');
 const User = require('../models/user');
+const BadRequest = require('../errors/BadRequest');
+const {
+  MESSAGE_400,
+  ALL_RIGHT,
+  BYE_BYE,
+  MESSAGE_404_BY_ID,
+  MESSAGE_409_11000,
+} = require('../utils/errMessages');
 require('dotenv').config();
 
 const {
@@ -22,21 +30,21 @@ const createNewUser = ((req, res, next) => {
             });
         }).catch((err) => {
           if (err.code === 11000) {
-            return next(new Conflict('a user with email this already exists'));
+            return next(new Conflict(MESSAGE_409_11000));
           }
           return next(err);
         });
     })
     .catch((err) => {
-      if (err.code === 11000) {
-        return next(new Conflict('a user with email this already exists'));
+      if (err.name === 'ValidationError') {
+        return next(new BadRequest(MESSAGE_400));
       }
       return next(err);
     });
 });
 
 const getMyInfo = ((req, res, next) => {
-  User.findById(req.body._id)
+  User.findById(req.user._id)
     .then((myInfo) => {
       if (myInfo) {
         res.send(
@@ -45,7 +53,7 @@ const getMyInfo = ((req, res, next) => {
             email: myInfo.email,
           },
         );
-      } else throw next(new NotFound('User with id not found'));
+      } else throw next(new NotFound(MESSAGE_404_BY_ID));
     }).catch(next);
 });
 
@@ -59,12 +67,14 @@ const updateMyInfo = ((req, res, next) => {
     { new: true, runValidators: true },
   )
     .orFail(() => {
-      next(new NotFound('User with id not found'));
+      next(new NotFound(MESSAGE_404_BY_ID));
     })
     .then((user) => res.send({ newUserInfo: user }))
     .catch((err) => {
       if (err.code === 11000) {
-        return next(new Conflict('a user with email this already exists'));
+        return next(new Conflict(MESSAGE_409_11000));
+      } if (err.name === 'ValidationError') {
+        return next(new BadRequest(MESSAGE_400));
       }
       return next(err);
     });
@@ -85,14 +95,14 @@ const login = (req, res, next) => {
         httpOnly: true,
         sameSite: true,
       });
-      res.send(({ message: 'All right', token: newToken }));
+      res.send(({ message: ALL_RIGHT, token: newToken }));
     })
     .catch(next);
 };
 
 const logOut = (req, res) => {
   res.status(202).clearCookie('jwt')
-    .send({ message: 'пока пока' });
+    .send({ message: BYE_BYE });
 };
 
 module.exports = {
